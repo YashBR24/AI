@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Compress - Smart Image Compression</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">
+                <i class="fas fa-compress"></i>
+                <span>AI Compress</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#benefits">Benefits</a>
+                <a href="{% url 'contact' %}">Contact</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a>
+                    <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    <a href="{% url 'register' %}" class="btn-signup">Sign Up</a>
+                {% endif %}
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Transform Your Images with AI</h1>
+            <p>Advanced image compression powered by deep learning algorithms for optimal storage and lightning-fast transmission.</p>
+            <div class="cta-buttons">
+                <a href="{% url 'compress' %}" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> Get Started
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i class="fas fa-brain feature-icon"></i>
+                    <h3>Deep Learning Algorithms</h3>
+                    <p>State-of-the-art neural networks optimize your images intelligently.</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-bolt feature-icon"></i>
+                    <h3>Real-time Compression</h3>
+                    <p>Instant compression with immediate results and preview.</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <h3>Lossless Quality</h3>
+                    <p>Maintain image quality while reducing file size significantly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="benefits" class="benefits">
+        <div class="container">
+            <div class="benefits-content">
+                <div class="benefits-text">
+                    <h2>Why Choose AI Compress?</h2>
+                    <p>Our advanced compression technology delivers exceptional results:</p>
+                </div>
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <i class="fas fa-hdd"></i>
+                        <h3>Storage Savings</h3>
+                        <p>Reduce storage costs by up to 90% without compromising quality.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <h3>Faster Loading</h3>
+                        <p>Improve website performance with optimized images.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-smile"></i>
+                        <h3>Better UX</h3>
+                        <p>Enhanced user experience with quick-loading images.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="cta" class="cta">
+        <div class="container">
+            <h2>Ready to Optimize Your Images?</h2>
+            <p>Join thousands of satisfied users who have transformed their image storage.</p>
+            <a href="{% url 'compress' %}" class="btn btn-primary">
+                <i class="fas fa-compress"></i> Start Compressing Now
+            </a>
+            <p class="cta-note">No credit card required. Start your free trial today.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="logo">
+                        <i class="fas fa-compress"></i>
+                        <span>AI Compress</span>
+                    </div>
+                    <p>&copy; 2024 AI Compress. All rights reserved.</p>
+                </div>
+                <div class="footer-links">
+                    {% comment %} <a href="{% url 'privacy' %}">Privacy Policy</a> {% endcomment %}
+                    {% comment %} <a href="{% url 'terms' %}">Terms of Service</a> {% endcomment %}
+                    <a href="{% url 'contact' %}">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu (Hidden by default) -->
+    <div class="mobile-menu">
+        <div class="mobile-menu-header">
+            <div class="logo">
+                <i class="fas fa-compress"></i>
+                <span>AI Compress</span>
+            </div>
+            <button class="mobile-menu-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-menu-links">
+            <a href="#features">Features</a>
+            <a href="#benefits">Benefits</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a>
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="{% url 'register' %}" class="btn-signup">Sign Up</a>
+            {% endif %}
+        </div>
+    </div>
+    
+</body>
+</html>

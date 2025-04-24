@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  </head>
+  <body>
+    <div class="center">
+      <h1>Login</h1>
+        
+      <form method="POST" id="loginForm">
+        {% csrf_token %}
+
+        <div class="txt_field">
+          <input type="text" required name="username" id="username">
+          <span></span>
+          <label>Username</label>
+        </div>
+
+        <div class="txt_field">
+          <input type="password" required name="password" id="password">
+          <span></span>
+          <label>Password</label>
+        </div>
+
+        <input type="submit" value="Login">
+        <div class="signup_link">
+          Not a member? <a href="{% url 'register' %}">Signup</a>
+          <p>Forgot your Password? <a href="{% url 'forgot-password' %}">Reset Password</a></p> 
+        </div>
+      </form>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Display messages with SweetAlert2
+        {% if messages %}
+          {% for message in messages %}
+            Swal.fire({
+              title: '{{ message.tags|title }}!',
+              text: "{{ message }}",
+              icon: '{% if message.tags == "error" %}error{% else %}success{% endif %}',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+          {% endfor %}
+        {% endif %}
+
+        // Form validation
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', function(e) {
+          const username = document.getElementById('username').value.trim();
+          const password = document.getElementById('password').value.trim();
+          
+          if (username === '') {
+            e.preventDefault();
+            Swal.fire({
+              title: 'Error!',
+              text: 'Username cannot be empty',
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+            return;
+          }
+          
+          if (password === '') {
+            e.preventDefault();
+            Swal.fire({
+              title: 'Error!',
+              text: 'Password cannot be empty',
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+            return;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

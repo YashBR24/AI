@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Based Image Compression System</title>
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">
+                <img src="https://images.unsplash.com/photo-1527430253228-e93688616381?w=50&h=50&fit=crop" alt="Logo" class="logo-img">
+                <span>AI Compress</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+                <a href="{% url 'login' %}" class="btn-login">Login</a>
+                <a href="{% url 'register' %}" class="btn-signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Revolutionary AI-Powered Image Compression</h1>
+                    <p>Optimize your storage and transmission with our cutting-edge deep learning compression system.</p>
+                    <div class="cta-buttons">
+                        <a href="{% url 'login' %}" class="btn btn-primary">Get Started</a>
+                        <a href="#demo" class="btn btn-secondary">See Demo</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80" alt="AI Deep Learning Compression">
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2>Advanced Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=150&h=150&fit=crop" alt="Deep Learning">
+                        <h3>Deep Learning Algorithm</h3>
+                        <p>State-of-the-art neural networks for optimal compression ratios</p>
+                    </div>
+                    <div class="feature-card">
+                        <img src="https://images.unsplash.com/photo-1580894894513-541e068a3e2b?w=150&h=150&fit=crop" alt="Quality">
+                        <h3>Lossless Quality</h3>
+                        <p>Maintain image quality while reducing file size significantly</p>
+                    </div>
+                    <div class="feature-card">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=150&h=150&fit=crop" alt="Real-time">
+                        <h3>Real-time Processing</h3>
+                        <p>Instant compression with our optimized algorithms</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="how-it-works">
+            <div class="container">
+                <h2>How It Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Upload Images</h3>
+                        <p>Upload your images through our intuitive interface</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>AI Processing</h3>
+                        <p>Our AI analyzes and optimizes your images</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Download</h3>
+                        <p>Get your compressed images instantly</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="demo" class="demo">
+            <div class="container">
+                <h2>See the Difference</h2>
+                <div class="comparison-slider">
+                    <figure class="comparison-figure">
+                        <img src="https://images.unsplash.com/photo-1682687982501-1e58ab814714?w=800&h=500&fit=crop" alt="Original Image" class="comparison-image">
+                        <div class="comparison-separator"></div>
+                        <img src="https://images.unsplash.com/photo-1682687982501-1e58ab814714?w=400&h=250&fit=crop" alt="Compressed Image" class="comparison-image">
+                    </figure>
+                    <div class="comparison-labels">
+                        <span>Original (2.5MB)</span>
+                        <span>Compressed (250KB)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <h2>About Us</h2>
+                <div class="about-grid">
+                    <div class="about-content">
+                        <h3>Our Mission</h3>
+                        <p>At AI Compress, we're revolutionizing image compression through advanced deep learning technology. Our mission is to make high-quality image optimization accessible to everyone while reducing storage costs and improving transmission speeds.</p>
+                        
+                        <h3>Our Technology</h3>
+                        <p>Our compression system utilizes state-of-the-art neural networks and machine learning algorithms to analyze and optimize images while maintaining visual quality. We achieve compression ratios of up to 90% without significant quality loss.</p>
+                        
+                        <h3>Why Choose Us</h3>
+                        <ul class="about-list">
+                            <li>Advanced AI Technology</li>
+                            <li>Lossless Compression</li>
+                            <li>Fast Processing</li>
+                            <li>Secure Storage</li>
+                            <li>24/7 Support</li>
+                        </ul>
+                    </div>
+                    <div class="about-image">
+                        <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop" alt="Our Team">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2>Contact Us</h2>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <h3>Get in Touch</h3>
+                        <p>Have questions about our AI compression technology? We're here to help!</p>
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <i class="icon-email"></i>
+                                <h4>Email</h4>
+                                <p>support@aicompress.com</p>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon-location"></i>
+                                <h4>Address</h4>
+                                <p>123 AI Street, Surat, Gujrat 395004</p>
+                            </div>
+                            <div class="contact-item">
+                                <i class="icon-phone"></i>
+                                <h4>Phone</h4>
+                                <p>+91 0000000000</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-form">
+                        <form method="POST" action="#contact">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" rows="5" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <h2>Ready to Optimize Your Images?</h2>
+                <p>Join thousands of satisfied users and start compressing your images today.</p>
+                <div class="cta-buttons">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>AI Compress</h3>
+                    <p>Advanced image compression using deep learning</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Product</h4>
+                        <a href="#features">Features</a>
+                        <a href="#how-it-works">How It Works</a>
+                        <a href="#demo">Demo</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Company</h4>
+                        <a href="#about">About Us</a>
+                        <a href="#contact">Contact</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AI Compress. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

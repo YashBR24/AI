@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - AI Compress</title>
+    <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+</head>
+<body>
+    <!-- Loading Animation -->
+    <div class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="{% url 'home' %}" class="logo">
+                <i class="fas fa-compress"></i>
+                <span>AI Compress</span>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
+                <a href="{% url 'contact' %}"><i class="fas fa-envelope"></i> Contact</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a>
+                    <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section class="contact-section">
+            <div class="container">
+                <h1>Get in Touch</h1>
+                
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <h2>Let's Connect</h2>
+                        <p>Have questions about our AI compression technology? We're here to help! Choose the best way to reach us.</p>
+                        
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <h3>Email Us</h3>
+                                    <p>support@aicompress.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <h3>Visit Us</h3>
+                                    <p>123 AI Street, Tech City<br>TC 12345</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <h3>Business Hours</h3>
+                                    <p>Monday - Friday: 9AM - 6PM<br>Weekend: 10AM - 4PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-form">
+                        <form method="POST" id="contactForm">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" name="name" required placeholder="Enter your name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" required placeholder="Enter your email">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" required placeholder="How can we help you?"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 AI Compress. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'contact' %}">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Remove loading screen when page is loaded
+        window.addEventListener('load', () => {
+            const loader = document.querySelector('.loading');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        });
+
+        // Form validation and SweetAlert2 integration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display messages with SweetAlert2
+            {% if messages %}
+                {% for message in messages %}
+                    Swal.fire({
+                        title: '{{ message.tags|title }}!',
+                        text: "{{ message }}",
+                        icon: '{% if message.tags == "error" %}error{% else %}success{% endif %}',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#4F46E5'
+                    });
+                {% endfor %}
+            {% endif %}
+
+            // Form validation
+            const contactForm = document.getElementById('contactForm');
+            contactForm.addEventListener('submit', function(e) {
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const message = document.getElementById('message').value.trim();
+                
+                // Validate name
+                if (name.length < 2) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Please enter a valid name',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#4F46E5'
+                    });
+                    return;
+                }
+                
+                // Validate email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Please enter a valid email address',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#4F46E5'
+                    });
+                    return;
+                }
+                
+                // Validate message
+                if (message.length < 10) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Message must be at least 10 characters long',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#4F46E5'
+                    });
+                    return;
+                }
+            });
+
+            // Add animation to form inputs
+            const formInputs = document.querySelectorAll('.form-group input, .form-group textarea');
+            formInputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', () => {
+                    if (!input.value) {
+                        input.parentElement.classList.remove('focused');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

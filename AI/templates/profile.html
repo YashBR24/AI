@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - AI Compress</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">AI Compress</div>
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                {% comment %} <a href="{% url 'about' %}">About</a> {% endcomment %}
+                <a href="{% url 'contact' %}">Contact</a>
+                <a href="{% url 'profile' %}">Profile</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="profile-section">
+            <div class="container">
+                <div class="profile-header">
+                    <h1>User Profile</h1>
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <div class="message {{ message.tags }}">{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="profile-content">
+                    <div class="profile-info">
+                        <h2>Account Information</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Username</label>
+                                <p>{{ user.username }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Email</label>
+                                <p>{{ user.email }}</p>
+                                <small>(Email cannot be changed)</small>
+                            </div>
+                            <div class="info-item">
+                                <label>Full Name</label>
+                                <p>{{ user.first_name }} {{ user.last_name }}</p>
+                            </div>
+                            <div class="info-item">
+                                <label>Member Since</label>
+                                <p>{{ user.date_joined|date:"F j, Y" }}</p>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button id="editProfileBtn" class="btn btn-primary">Edit Profile</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Profile</h2>
+            <form id="editProfileForm" method="POST" action="{% url 'update-profile' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="{{ user.username }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-save">Save Changes</button>
+                    <button type="button" class="btn btn-cancel" id="cancelEdit">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 AI Compress. All rights reserved.</p>
+            <div class="footer-links">
+                {% comment %} <a href="{% url 'about' %}">About Us</a> {% endcomment %}
+                <a href="{% url 'contact' %}">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById("editProfileModal");
+        const btn = document.getElementById("editProfileBtn");
+        const span = document.getElementsByClassName("close")[0];
+        const cancelBtn = document.getElementById("cancelEdit");
+        
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+        
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+        
+        cancelBtn.onclick = function() {
+            modal.style.display = "none";
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Form validation
+        document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value.trim();
+            const firstName = document.getElementById('first_name').value.trim();
+            const lastName = document.getElementById('last_name').value.trim();
+            
+            if (username === '') {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Username cannot be empty',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            if (username.length < 3) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Username must be at least 3 characters long',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            if (firstName === '' || lastName === '') {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'First name and last name cannot be empty',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+        });
+
+        // Display SweetAlert2 for messages
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    title: '{{ message.tags|title }}!',
+                    text: "{{ message }}",
+                    icon: '{% if message.tags == "error" %}error{% else %}success{% endif %}',
+                    confirmButtonText: 'OK'
+                });
+            {% endfor %}
+        {% endif %}
+    </script>
+</body>
+</html>

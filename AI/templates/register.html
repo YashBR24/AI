@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    {% load static %}
+    <meta charset="utf-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+  </head>
+  <body>
+    <div class="center">
+      <h1>Register</h1>
+        
+      <form method="POST" id="registerForm">
+        {% csrf_token %}
+      
+        <div class="txt_field">
+            <input type="text" required name="first_name" id="first_name">
+            <span></span>
+            <label>First Name</label>
+        </div>
+
+        <div class="txt_field">
+            <input type="text" required name="last_name" id="last_name">
+            <span></span>
+            <label>Last Name</label>
+        </div>
+
+        <div class="txt_field">
+          <input type="text" required name="username" id="username">
+          <span></span>
+          <label>Username</label>
+        </div>
+
+        <div class="txt_field">
+            <input type="email" required name="email" id="email">
+            <span></span>
+            <label>Email</label>
+        </div>
+
+        <div class="txt_field">
+          <input type="password" required name="password" id="password">
+          <span></span>
+          <label>Password</label>
+        </div>    
+
+        <input type="submit" value="Register">
+        <div class="signup_link">
+          Already have an account? <a href="{% url 'login' %}">Login</a>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Display messages with SweetAlert2
+        {% if messages %}
+          {% for message in messages %}
+            Swal.fire({
+              title: '{{ message.tags|title }}!',
+              text: "{{ message }}",
+              icon: '{% if message.tags == "error" %}error{% else %}success{% endif %}',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+          {% endfor %}
+        {% endif %}
+
+        // Form validation
+        const registerForm = document.getElementById('registerForm');
+        registerForm.addEventListener('submit', function(e) {
+          const firstName = document.getElementById('first_name').value.trim();
+          const lastName = document.getElementById('last_name').value.trim();
+          const username = document.getElementById('username').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value.trim();
+          
+          // Validate first name
+          if (firstName === '') {
+            e.preventDefault();
+            Swal.fire({
+              title: 'Error!',
+              text: 'First name cannot be empty',
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+            return;
+          }
+          
+          // Validate last name
+          if (lastName === '') {
+            e.preventDefault();
+            Swal.fire({
+              title: 'Error!',
+              text: 'Last name cannot be empty',
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+            return;
+          }
+          
+          // Validate username
+          if (username === '') {
+            e.preventDefault();
+            Swal.fire({
+              title: 'Error!',
+              text: 'Username cannot be empty',
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+            return;
+          }
+          
+          if (username.length < 3) {
+            e.preventDefault();
+            Swal.fire({
+              title: 'Error!',
+              text: 'Username must be at least 3 characters long',
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+            return;
+          }
+          
+          // Validate email
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            e.preventDefault();
+            Swal.fire({
+              title: 'Error!',
+              text: 'Please enter a valid email address',
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+            return;
+          }
+          
+          // Validate password
+          if (password.length < 6) {
+            e.preventDefault();
+            Swal.fire({
+              title: 'Error!',
+              text: 'Password must be at least 6 characters long',
+              icon: 'error',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#4F46E5'
+            });
+            return;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

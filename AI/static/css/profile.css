@@ -1,0 +1,497 @@
+/* Base Styles */
+:root {
+  --primary-color: #646cff;
+  --secondary-color: #535bf2;
+  --dark-bg: #1a1a1a;
+  --light-bg: #ffffff;
+  --text-color: #213547;
+  --text-light: rgba(255, 255, 255, 0.87);
+  --gradient-bg: linear-gradient(135deg, #f6f8ff 0%, #f0f3ff 100%);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+  --card-hover-transform: translateY(-5px);
+  --error-color: #ef4444;
+  --success-color: #10b981;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--light-bg);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Header & Navigation */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+header.scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow-md);
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--dark);
+  font-weight: 500;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-links a:hover {
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* Profile Section */
+.profile-section {
+  padding: 8rem 0 4rem;
+  background: var(--gradient-bg);
+  min-height: 100vh;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.profile-header h1 {
+  font-size: 2.5rem;
+  color: var(--dark-bg);
+  margin-bottom: 1rem;
+}
+
+.profile-content {
+  display: grid;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.profile-info, .compression-stats {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+}
+
+.profile-info:hover, .compression-stats:hover {
+  transform: var(--card-hover-transform);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Updated Info Grid and Items */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Increased min-width for more space */
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.info-item {
+  padding: 1.5rem;
+  background: var(--gradient-bg);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden; /* Prevent content from overflowing */
+}
+
+/* Specific styling for the email field and other items */
+.info-item p {
+  font-size: 1rem; /* Slightly smaller font size for better fit */
+  color: var(--dark-bg);
+  word-break: break-all; /* Break long emails to fit within the container */
+  overflow-wrap: break-word; /* Alternative for better browser support */
+  line-height: 1.3; /* Improve readability */
+}
+
+/* Enhance the email field visually */
+.info-item:nth-child(2) { /* Targeting the email field (second item in the grid) */
+  background: linear-gradient(135deg, #e6e9ff 0%, #d9dcff 100%); /* Subtle background for email */
+  border: 1px solid var(--primary-color); /* Highlight the email field */
+}
+
+/* Improve hover effect for info items */
+.info-item:hover {
+  transform: var(--card-hover-transform);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #e0e3ff 0%, #d3d6ff 100%); /* Subtle hover background change */
+}
+
+.info-item label {
+  font-weight: 600;
+  color: var(--primary-color);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item small {
+  display: block;
+  font-size: 0.75rem; /* Slightly smaller for better hierarchy */
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 2rem;
+  background: var(--gradient-bg);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: 0.5s;
+}
+
+.stat-item:hover::before {
+  transform: translateX(100%);
+}
+
+.stat-item:hover {
+  transform: var(--card-hover-transform);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-item h3 {
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.stat-item p {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--dark-bg);
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  color: var(--dark-bg);
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  position: relative;
+  display: inline-block;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+/* Profile Actions */
+.profile-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.8rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  width: 90%;
+  max-width: 500px;
+  animation: fadeInDown 0.3s ease-out;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.close:hover {
+  color: var(--primary-color);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(100, 108, 255, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.btn-save {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-cancel {
+  background-color: #e5e7eb;
+  color: var(--text-color);
+}
+
+.btn-save:hover {
+  background-color: var(--secondary-color);
+}
+
+.btn-cancel:hover {
+  background-color: #d1d5db;
+}
+
+/* Messages */
+.messages {
+  margin-bottom: 1.5rem;
+}
+
+.message {
+  padding: 0.8rem 1.2rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.message.success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+}
+
+.message.error {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error-color);
+}
+
+/* Footer */
+footer {
+  background-color: var(--dark-bg);
+  color: var(--text-light);
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+      opacity: 0;
+      transform: translateY(-20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .info-grid, .stats-grid {
+      grid-template-columns: 1fr; /* Stack items on smaller screens */
+  }
+
+  .info-item p {
+    font-size: 0.9rem; /* Smaller font size for mobile */
+  }
+
+  .info-item {
+    padding: 1rem; /* Reduce padding for smaller screens */
+  }
+
+  .profile-header h1 {
+      font-size: 2rem;
+  }
+
+  .stat-item p {
+      font-size: 2rem;
+  }
+
+  .form-actions {
+      flex-direction: column;
+      gap: 1rem;
+  }
+
+  .btn {
+      width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+      padding: 0 1rem;
+  }
+
+  .profile-info, .compression-stats {
+      padding: 1.5rem;
+  }
+
+  .info-item p {
+    font-size: 0.85rem; /* Even smaller for very small screens */
+  }
+
+  .info-grid {
+    gap: 1rem; /* Reduce gap for better spacing */
+  }
+
+  .modal-content {
+      width: 95%;
+      margin: 20% auto;
+      padding: 1.5rem;
+  }
+}
