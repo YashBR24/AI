@@ -18,6 +18,8 @@ from PIL import Image
 import os
 import uuid
 import io
+import requests
+from sklearn.decomposition import PCA
 
 def LandingView(request):
     if request.method == 'POST':
@@ -332,6 +334,7 @@ def CompressView(request):
     if request.method == "POST" and request.FILES.get("fileInput"):
         uploaded_file = request.FILES["fileInput"]
         ip_address = get_client_ip(request)
+        original_size = request.POST.get("original_size")  # Original size in bytes
 
         # Check file size (10MB = 10 * 1024 * 1024 bytes)
         if uploaded_file.size > 10 * 1024 * 1024:
@@ -343,7 +346,7 @@ def CompressView(request):
             user=request.user,
             activity_type='UPLOAD',
             ip_address=ip_address,
-            details=f"User uploaded image: {uploaded_file.name} ({uploaded_file.size / 1024:.2f} KB)"
+            details=f"User uploaded image: {uploaded_file.name} (Original: {float(original_size) / 1024:.2f} KB, Uploaded: {uploaded_file.size / 1024:.2f} KB)"
         )
 
         # Compress the image using optimized JPEG compression
@@ -351,7 +354,7 @@ def CompressView(request):
             original_array, compressed_array, compressed_path = compress_image_with_jpeg(uploaded_file)
 
             # Calculate file sizes
-            original_size = uploaded_file.size / 1024  # in KB
+            original_size_kb = float(original_size) / 1024  # Convert original size to KB
             absolute_compressed_path = os.path.join(settings.MEDIA_ROOT, compressed_path)
             if not os.path.exists(absolute_compressed_path):
                 raise FileNotFoundError(f"Compressed file not found at {absolute_compressed_path}")
@@ -362,16 +365,15 @@ def CompressView(request):
                 user=request.user,
                 activity_type='COMPRESSION',
                 ip_address=ip_address,
-                details=f"Image compressed from {original_size:.2f} KB to {compressed_size:.2f} KB using JPEG and saved at {compressed_path}"
+                details=f"Image compressed from {original_size_kb:.2f} KB to {compressed_size:.2f} KB using JPEG and saved at {compressed_path}"
             )
 
             # Generate the URL for the compressed image
             compressed_url = default_storage.url(compressed_path)
-            print(f"Compressed URL: {compressed_url}")  # Debug print
 
             # Prepare response data
             response_data = {
-                "original_size": f"{original_size:.2f}",
+                "original_size": f"{original_size_kb:.2f}",
                 "compressed_size": f"{compressed_size:.2f}",
                 "compressed_url": compressed_url,
                 "success": True
@@ -410,16 +412,20 @@ def LogDownloadView(request):
 
     return JsonResponse({"success": False, "error": "Invalid request method"})
 
-def compress_image_with_jpeg(image_file, quality=85):
+def compress_image_with_jpeg(image_file, quality=75):
     """
-    Compress the image using optimized JPEG compression without AI.
+    Compress the image using optimized JPEG compression.
     """
     # Load and preprocess the image
-    image = Image.open(image_file).convert("RGB")
+    try:
+        image = Image.open(image_file).convert("RGB")
+    except Exception as e:
+        raise Exception(f"Failed to open image: {str(e)}")
+
     original_array = np.array(image)
 
     # Resize if necessary (optional, keeps image within reasonable dimensions)
-    max_size = (1024, 1024)  # Example max resolution
+    max_size = (1024, 1024)  # Max resolution
     image.thumbnail(max_size, Image.Resampling.LANCZOS)
 
     # Save with JPEG compression
@@ -428,24 +434,28 @@ def compress_image_with_jpeg(image_file, quality=85):
         os.makedirs(temp_dir)
 
     unique_filename = f"temp/compressed_{uuid.uuid4().hex}.jpg"
-    compressed_path = os.path.join(settings.MEDIA_ROOT, unique_filename)
-    
+    compressed_path = unique_filename  # Relative path for storage
+
     # Save to a BytesIO object first to optimize quality
     buffer = io.BytesIO()
-    image.save(buffer, format="JPEG", quality=quality, optimize=True)
+    try:
+        image.save(buffer, format="JPEG", quality=quality, optimize=True)
+    except Exception as e:
+        raise Exception(f"Failed to save compressed image: {str(e)}")
     buffer.seek(0)
-    
-    # Save to file
-    with open(compressed_path, 'wb') as f:
-        f.write(buffer.read())
-    
-    print(f"Saving compressed image to: {compressed_path}")
-    print(f"File exists after saving: {os.path.exists(compressed_path)}")
 
-    compressed_image = Image.open(compressed_path)
+    # Save to file using default_storage
+    compressed_path = default_storage.save(compressed_path, ContentFile(buffer.read()))
+
+    # Verify the file exists
+    absolute_compressed_path = os.path.join(settings.MEDIA_ROOT, compressed_path)
+    if not os.path.exists(absolute_compressed_path):
+        raise FileNotFoundError(f"Compressed file not found at {absolute_compressed_path}")
+
+    compressed_image = Image.open(absolute_compressed_path)
     compressed_array = np.array(compressed_image)
 
-    return original_array, compressed_array, unique_filename
+    return original_array, compressed_array, compressed_path
 
 def ContactView(request):
     if request.method == 'POST':
@@ -527,3 +537,48 @@ def UpdateProfileView(request):
 
 def AboutView(request):
     return render(request, 'about.html')
+
+# Views for image generation
+HUGGINGFACE_API_TOKEN = getattr(settings, 'HUGGINGFACE_API_TOKEN', None)
+MODEL_ID = "stabilityai/stable-diffusion-xl-base-1.0"
+API_URL = f"https://api-inference.huggingface.co/models/{MODEL_ID}"
+HEADERS = {"Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}"}
+
+@login_required
+def generate_image(request):
+    if request.method == 'POST':
+        prompt = request.POST.get('prompt')
+        if not prompt:
+            return render(request, 'generate_image.html', {'error': 'Please enter a prompt.'})
+
+        if not HUGGINGFACE_API_TOKEN:
+            return render(request, 'generate_image.html', {'error': 'Hugging Face API token is not configured in settings.'})
+
+        payload = {"inputs": prompt}
+        try:
+            response = requests.post(API_URL, headers=HEADERS, json=payload)
+            response.raise_for_status()
+            image_bytes = response.content
+
+            img = Image.open(io.BytesIO(image_bytes))
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+
+            output = io.BytesIO()
+            img.save(output, format='JPEG', quality=90)
+            output.seek(0)
+            image_bytes_jpg = output.read()
+
+            image_file = ContentFile(image_bytes_jpg)
+            filename = f"generated_images/generated_image_{prompt[:20].replace(' ', '_')}.jpg"
+            saved_path = default_storage.save(filename, image_file)
+            image_url = default_storage.url(saved_path)
+
+            return render(request, 'generate_image.html', {'image_url': image_url})
+
+        except requests.exceptions.RequestException as e:
+            return render(request, 'generate_image.html', {'error': f'API request failed: {e}'})
+        except Exception as e:
+            return render(request, 'generate_image.html', {'error': f'Error processing image: {e}'})
+    else:
+        return render(request, 'generate_image.html')

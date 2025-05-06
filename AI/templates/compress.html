@@ -1,354 +1,3 @@
-{% comment %} <!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compress Media - AI Compress</title>
-    <link rel="stylesheet" href="{% static 'css/compress.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"></script>
-    <script>
-        // Disable right-click
-        document.addEventListener('contextmenu', event => event.preventDefault());
-
-        // Disable keyboard shortcuts
-        document.addEventListener('keydown', event => {
-            if (
-                event.keyCode === 123 || // F12
-                (event.ctrlKey && event.shiftKey && (event.keyCode === 73 || event.keyCode === 74)) || // Ctrl+Shift+I or Ctrl+Shift+J
-                (event.ctrlKey && event.keyCode === 85) // Ctrl+U
-            ) {
-                event.preventDefault();
-            }
-        }, false);
-
-        // Detect and prevent Developer Tools opening
-        setInterval(() => {
-            const devtools = /./;
-            devtools.toString = function() {
-                throw new Error('DevTools Blocked');
-            };
-            console.log('%c', devtools);
-        }, 1000);
-    </script>
-</head>
-<body>
-    <header>
-        <nav class="container">
-            <div class="logo">AI Compress</div>
-            <div class="nav-links">
-                <a href="{% url 'home' %}">Home</a>
-                <a href="{% url 'profile' %}">Profile</a>
-                <a href="{% url 'logout' %}">Logout</a>
-            </div>
-        </nav>
-    </header>
-
-    <main class="compress-page">
-        <div class="container">
-            <h1>Compress Your Media</h1>
-            
-            <div class="upload-section">
-                <div class="dropify-container">
-                    <input type="file" class="dropify" id="fileInput" 
-                           data-allowed-file-extensions="jpg jpeg png gif" 
-                           data-max-file-size="5M"
-                           data-height="300">
-                </div>
-        
-                <div class="file-support-text">
-                    <p>Supports: JPG, PNG, GIF (Max size: 5MB)</p>
-                </div>
-            </div>
-
-            <div class="compression-progress" id="compressionProgress" style="display: none;">
-                <h3>Compressing your image...</h3>
-                <div class="progress-bar">
-                    <div class="progress-bar-fill" id="progressBarFill"></div>
-                </div>
-                <p id="progressText">0%</p>
-            </div>
-
-            <div class="preview-container" id="previewContainer" style="display: none;">
-                <h2>Compression Results</h2>
-                <div class="preview-grid" id="previewGrid">
-                    <!-- Comparison will be displayed here -->
-                </div>
-                <div class="actions">
-                    <button class="btn" id="downloadBtn">Download Compressed Image</button>
-                    <button class="btn btn-outline" id="compressNewBtn">Compress Another Image</button>
-                </div>
-            </div>
-
-            <div class="actions" id="initialActions">
-                <button class="btn" id="compressBtn">Compress Image</button>
-            </div>
-
-            <div class="sample-images">
-                <h2>Sample Images</h2>
-                <p>Don't have an image? Try one of these:</p>
-                <div class="sample-grid">
-                    <div class="sample-item" data-url="https://images.unsplash.com/photo-1579547945413-497e1b99dac0?w=800&auto=format&fit=crop">
-                        <img src="https://images.unsplash.com/photo-1579547945413-497e1b99dac0?w=300&auto=format&fit=crop" alt="Sample 1">
-                        <p>Nature</p>
-                    </div>
-                    <div class="sample-item" data-url="https://images.unsplash.com/photo-1682685797507-d44d838b0ac7?w=800&auto=format&fit=crop">
-                        <img src="https://images.unsplash.com/photo-1682685797507-d44d838b0ac7?w=300&auto=format&fit=crop" alt="Sample 2">
-                        <p>Architecture</p>
-                    </div>
-                    <div class="sample-item" data-url="https://images.unsplash.com/photo-1682686581854-5e71f58e7e3f?w=800&auto=format&fit=crop">
-                        <img src="https://images.unsplash.com/photo-1682686581854-5e71f58e7e3f?w=300&auto=format&fit=crop" alt="Sample 3">
-                        <p>Abstract</p>
-                    </div>
-                    <div class="sample-item" data-url="https://images.unsplash.com/photo-1682687220063-4742bd7fd538?w=800&auto=format&fit=crop">
-                        <img src="https://images.unsplash.com/photo-1682687220063-4742bd7fd538?w=300&auto=format&fit=crop" alt="Sample 4">
-                        <p>Landscape</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>© 2025 AI Compress. All rights reserved.</p>
-            <div class="footer-links">
-                <a href="{% url 'contact' %}">Contact</a>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        $(document).ready(function() {
-            // Initialize Dropify
-            $('.dropify').dropify({
-                messages: {
-                    default: 'Drag and drop an image here or click to browse',
-                    replace: 'Drag and drop or click to replace',
-                    remove: 'Remove',
-                    error: 'Error: File upload failed'
-                }
-            });
-
-            // Hide preview container initially
-            $('#previewContainer').hide();
-
-            // Sample images click handler
-            $('.sample-item').click(function() {
-                const imageUrl = $(this).data('url');
-                fetch(imageUrl)
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const file = new File([blob], "sample-image.jpg", { type: "image/jpeg" });
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(file);
-                        document.querySelector('.dropify').files = dataTransfer.files;
-                        $('.dropify').trigger('change');
-                        Swal.fire({
-                            title: 'Image Selected!',
-                            text: 'Sample image has been loaded successfully.',
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error loading sample image:', error);
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Failed to load sample image.',
-                            icon: 'error'
-                        });
-                    });
-            });
-
-            // Compress button click handler
-            $('#compressBtn').click(function() {
-                const fileInput = document.querySelector('.dropify');
-                const hasFile = fileInput.files && fileInput.files.length > 0;
-
-                if (!hasFile) {
-                    Swal.fire({
-                        title: 'No Image Selected',
-                        text: 'Please select an image to compress',
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
-                    });
-                    return;
-                }
-
-                // Show compression progress
-                $('#initialActions').hide();
-                $('#compressionProgress').show();
-
-                // Create FormData to send the file
-                const formData = new FormData();
-                formData.append('fileInput', fileInput.files[0]);
-                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-
-                // Simulate progress while waiting for server response
-                let progress = 0;
-                const progressInterval = setInterval(function() {
-                    progress += 10;
-                    $('#progressBarFill').css('width', progress + '%');
-                    $('#progressText').text(progress + '%');
-                    if (progress >= 90) clearInterval(progressInterval); // Stop at 90%, wait for server
-                }, 200);
-
-                // Send AJAX request to the server
-                $.ajax({
-                    url: "{% url 'compress' %}",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        clearInterval(progressInterval);
-                        $('#progressBarFill').css('width', '100%');
-                        $('#progressText').text('100%');
-                        setTimeout(function() {
-                            $('#compressionProgress').hide();
-                            if (response.success) {
-                                showCompressionResults(response);
-                                Swal.fire({
-                                    title: 'Compression Complete!',
-                                    text: `Image compressed from ${response.original_size} KB to ${response.compressed_size} KB`,
-                                    icon: 'success',
-                                    confirmButtonText: 'Great!'
-                                });
-                            } else {
-                                $('#initialActions').show();
-                                Swal.fire({
-                                    title: 'Compression Failed',
-                                    text: response.error,
-                                    icon: 'error',
-                                    confirmButtonText: 'Try Again'
-                                });
-                            }
-                        }, 500);
-                    },
-                    error: function(xhr, status, error) {
-                        clearInterval(progressInterval);
-                        $('#compressionProgress').hide();
-                        $('#initialActions').show();
-                        Swal.fire({
-                            title: 'Compression Failed',
-                            text: 'An error occurred while compressing the image.',
-                            icon: 'error',
-                            confirmButtonText: 'Try Again'
-                        });
-                    }
-                });
-            });
-
-            // Function to show compression results
-            function showCompressionResults(response) {
-                const originalSrc = URL.createObjectURL(document.querySelector('.dropify').files[0]);
-                const compressedSrc = response.compressed_url;
-                console.log("Compressed URL:", compressedSrc); // Debug log
-
-                // Test if the compressed image is accessible
-                const img = new Image();
-                img.onload = function() {
-                    console.log("Compressed image loaded successfully");
-                };
-                img.onerror = function() {
-                    console.error("Failed to load compressed image at:", compressedSrc);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Failed to load the compressed image. Please try again.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                };
-                img.src = compressedSrc;
-
-                const comparisonHtml = `
-                    <div class="comparison-container">
-                        <div class="comparison-item">
-                            <h3>Original</h3>
-                            <img src="${originalSrc}" alt="Original Image">
-                            <div class="file-info">
-                                <p>Size: ${response.original_size} KB</p>
-                                <p>Format: ${document.querySelector('.dropify').files[0].name.split('.').pop().toUpperCase()}</p>
-                            </div>
-                        </div>
-                        <div class="comparison-item">
-                            <h3>Compressed</h3>
-                            <img src="${compressedSrc}" alt="Compressed Image">
-                            <div class="file-info">
-                                <p>Size: ${response.compressed_size} KB</p>
-                                <p>Format: JPG</p>
-                                <p class="savings">${((response.original_size - response.compressed_size) / response.original_size * 100).toFixed(2)}% Smaller!</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                $('#previewGrid').html(comparisonHtml);
-                $('#previewContainer').show();
-            }
-
-            // Download button click handler with logging
-            $('#downloadBtn').click(function() {
-                const compressedSrc = $('#previewGrid .comparison-item:last-child img').attr('src');
-                const originalSize = $('#previewGrid .comparison-item:first-child .file-info p:first-child').text().replace('Size: ', '').replace(' KB', '');
-                const compressedSize = $('#previewGrid .comparison-item:last-child .file-info p:first-child').text().replace('Size: ', '').replace(' KB', '');
-
-                // Log the download action via AJAX
-                $.ajax({
-                    url: "{% url 'log_download' %}", // New endpoint for logging download
-                    type: "POST",
-                    data: {
-                        'compressed_url': compressedSrc,
-                        'original_size': originalSize,
-                        'compressed_size': compressedSize,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        console.log("Download logged successfully");
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error logging download:", error);
-                    }
-                });
-
-                // Trigger the download
-                const link = document.createElement('a');
-                link.href = compressedSrc;
-                link.download = 'compressed_image.jpg';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                Swal.fire({
-                    title: 'Download Started',
-                    text: 'Your compressed image is being downloaded.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            });
-
-            // Compress another image button
-            $('#compressNewBtn').click(function() {
-                $('#previewContainer').hide();
-                $('#initialActions').show();
-                const dropifyInstance = $('.dropify').data('dropify');
-                dropifyInstance.resetPreview();
-                dropifyInstance.clearElement();
-            });
-        });
-    </script>
-</body>
-</html> {% endcomment %}
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -379,6 +28,45 @@
             devtools.toString = function() { throw new Error('DevTools Blocked'); };
             console.log('%c', devtools);
         }, 1000);
+
+        // Client-side image compression
+        function compressImage(file, maxWidth, maxHeight, quality, callback) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Calculate new dimensions while maintaining aspect ratio
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convert to JPEG with specified quality
+                    canvas.toBlob(function(blob) {
+                        const compressedFile = new File([blob], file.name, { type: 'image/jpeg' });
+                        callback(compressedFile);
+                    }, 'image/jpeg', quality);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
     </script>
 </head>
 <body>
@@ -401,15 +89,15 @@
                 <div class="dropify-container">
                     <input type="file" class="dropify" id="fileInput" 
                            data-allowed-file-extensions="jpg jpeg png gif" 
-                           data-max-file-size="10M"  <!-- Updated to 10MB -->
+                           data-max-file-size="10M">
                 </div>
                 <div class="file-support-text">
-                    <p>Supports: JPG, PNG, GIF (Max size: 10MB)</p>  <!-- Updated text -->
+                    <p>Supports: JPG, PNG, GIF (Max size: 10MB)</p>
                 </div>
             </div>
 
             <div class="compression-progress" id="compressionProgress" style="display: none;">
-                <h3>Compressing your image with AI...</h3>
+                <h3>Compressing your image...</h3>
                 <div class="progress-bar">
                     <div class="progress-bar-fill" id="progressBarFill"></div>
                 </div>
@@ -520,7 +208,9 @@
                     return;
                 }
 
-                if (fileInput.files[0].size > 10 * 1024 * 1024) {
+                const file = fileInput.files[0];
+                const originalSize = file.size; // Capture original size in bytes
+                if (file.size > 10 * 1024 * 1024) {
                     Swal.fire({
                         title: 'File Too Large',
                         text: 'File size exceeds 10MB limit!',
@@ -533,60 +223,64 @@
                 $('#initialActions').hide();
                 $('#compressionProgress').show();
 
-                const formData = new FormData();
-                formData.append('fileInput', fileInput.files[0]);
-                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                // Compress image client-side
+                compressImage(file, 1024, 1024, 0.7, function(compressedFile) {
+                    const formData = new FormData();
+                    formData.append('fileInput', compressedFile);
+                    formData.append('original_size', originalSize); // Send original size in bytes
+                    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-                let progress = 0;
-                const progressInterval = setInterval(function() {
-                    progress += 10;
-                    $('#progressBarFill').css('width', progress + '%');
-                    $('#progressText').text(progress + '%');
-                    if (progress >= 90) clearInterval(progressInterval);
-                }, 200);
+                    let progress = 0;
+                    const progressInterval = setInterval(function() {
+                        progress += 10;
+                        $('#progressBarFill').css('width', progress + '%');
+                        $('#progressText').text(progress + '%');
+                        if (progress >= 90) clearInterval(progressInterval);
+                    }, 200);
 
-                $.ajax({
-                    url: "{% url 'compress' %}",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        clearInterval(progressInterval);
-                        $('#progressBarFill').css('width', '100%');
-                        $('#progressText').text('100%');
-                        setTimeout(function() {
+                    $.ajax({
+                        url: "{% url 'compress' %}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            clearInterval(progressInterval);
+                            $('#progressBarFill').css('width', '100%');
+                            $('#progressText').text('100%');
+                            setTimeout(function() {
+                                $('#compressionProgress').hide();
+                                if (response.success) {
+                                    showCompressionResults(response);
+                                    Swal.fire({
+                                        title: 'Compression Complete!',
+                                        text: `Image compressed from ${response.original_size} KB to ${response.compressed_size} KB`,
+                                        icon: 'success',
+                                        confirmButtonText: 'Great!'
+                                    });
+                                } else {
+                                    $('#initialActions').show();
+                                    Swal.fire({
+                                        title: 'Compression Failed',
+                                        text: response.error,
+                                        icon: 'error',
+                                        confirmButtonText: 'Try Again'
+                                    });
+                                }
+                            }, 500);
+                        },
+                        error: function(xhr, status, error) {
+                            clearInterval(progressInterval);
                             $('#compressionProgress').hide();
-                            if (response.success) {
-                                showCompressionResults(response);
-                                Swal.fire({
-                                    title: 'Compression Complete!',
-                                    text: `Image compressed from ${response.original_size} KB to ${response.compressed_size} KB`,
-                                    icon: 'success',
-                                    confirmButtonText: 'Great!'
-                                });
-                            } else {
-                                $('#initialActions').show();
-                                Swal.fire({
-                                    title: 'Compression Failed',
-                                    text: response.error,
-                                    icon: 'error',
-                                    confirmButtonText: 'Try Again'
-                                });
-                            }
-                        }, 500);
-                    },
-                    error: function(xhr, status, error) {
-                        clearInterval(progressInterval);
-                        $('#compressionProgress').hide();
-                        $('#initialActions').show();
-                        Swal.fire({
-                            title: 'Compression Failed',
-                            text: 'An error occurred while compressing the image.',
-                            icon: 'error',
-                            confirmButtonText: 'Try Again'
-                        });
-                    }
+                            $('#initialActions').show();
+                            Swal.fire({
+                                title: 'Compression Failed',
+                                text: 'An error occurred while compressing the image.',
+                                icon: 'error',
+                                confirmButtonText: 'Try Again'
+                            });
+                        }
+                    });
                 });
             });
 

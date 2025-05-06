@@ -19,6 +19,7 @@ urlpatterns = [
     path('update-profile/', views.UpdateProfileView, name='update-profile'),
     path('contact/', views.ContactView, name='contact'),
     path('about/', views.AboutView, name='about'),
+    path('generate/', views.generate_image, name='generate_image'),
 ]
 
 if settings.DEBUG:
